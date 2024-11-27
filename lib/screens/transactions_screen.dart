@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TransactionsScreen extends StatelessWidget {
+  const TransactionsScreen({super.key});
+
   // Function to delete a transaction
   Future<void> _deleteTransaction(String transactionId) async {
     await FirebaseFirestore.instance

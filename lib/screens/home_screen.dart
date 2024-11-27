@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _HomeScreenState createState() => _HomeScreenState();
 }
 
@@ -92,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 10),
             // Pie chart widget
             categoryExpenses.isNotEmpty
-                ? Container(
+                ? SizedBox(
                     height: 200,
                     child: PieChart(
                       PieChartData(
@@ -109,10 +112,10 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/transactions')
                     .then((_) => _calculateSummary()),
-                child: Text('View Transactions'),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),
+                child: Text('View Transactions'),
               ),
             ),
           ],
