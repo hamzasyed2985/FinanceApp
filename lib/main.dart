@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Finance Tracker',
       theme: ThemeData(primarySwatch: Colors.blue),
-      initialRoute: '/loginSignup', // Set login/signup screen as the initial route
+      initialRoute:
+          '/loginSignup', // Set login/signup screen as the initial route
       routes: {
         '/loginSignup': (context) => LoginSignupScreen(), // Add the route
         '/': (context) => HomeScreen(),

@@ -5,7 +5,6 @@ class AddTransactionScreen extends StatefulWidget {
   const AddTransactionScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _AddTransactionScreenState createState() => _AddTransactionScreenState();
 }
 
@@ -54,8 +53,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             .update(transactionData);
       }
 
-   
-      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     }
   }
