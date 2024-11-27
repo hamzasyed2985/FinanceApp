@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddTransactionScreen extends StatefulWidget {
+  const AddTransactionScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _AddTransactionScreenState createState() => _AddTransactionScreenState();
 }
 
@@ -51,6 +54,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             .update(transactionData);
       }
 
+   
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     }
   }
@@ -183,11 +188,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       _type = 'Income';
                       _category = 'Salary'; // Reset category for income
                     }),
-                    child: Text('Income'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           _type == 'Income' ? Colors.green : Colors.grey,
                     ),
+                    child: Text('Income'),
                   ),
                   SizedBox(width: 10),
                   ElevatedButton(
@@ -195,11 +200,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       _type = 'Expense';
                       _category = 'Food'; // Reset category for expense
                     }),
-                    child: Text('Expense'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           _type == 'Expense' ? Colors.red : Colors.grey,
                     ),
+                    child: Text('Expense'),
                   ),
                 ],
               ),
