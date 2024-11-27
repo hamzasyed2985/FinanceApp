@@ -1,0 +1,15 @@
+# Force LF for source code
+*.yaml text eol=lf
+*.gql text eol=lf
+*.json text eol=lf
+*.rules text eol=lf
+*.cc text eol=lf
+*.h text eol=lf
+*.swift text eol=lf
+*.cmake text eol=lf
+
+# Treat binary files properly
+*.png binary
+*.jpg binary
+*.gif binary
+*.exe binary
