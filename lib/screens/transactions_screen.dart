@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TransactionsScreen extends StatelessWidget {
   const TransactionsScreen({super.key});
 
+  // Get the current user's UID
+  String? getCurrentUserUid() {
+    final user = FirebaseAuth.instance.currentUser;
+    return user?.uid;
+  }
+
   // Function to delete a transaction
   Future<void> _deleteTransaction(String transactionId) async {
+    String? userId = getCurrentUserUid();
+    if (userId == null) {
+      print("No user is logged in. Please log in first.");
+      return; // Ensure user is logged in
+    }
+
     await FirebaseFirestore.instance
-        .collection('transactions')
-        .doc(transactionId)
+        .collection('users') // Users collection
+        .doc(userId) // Document with user's UID
+        .collection('transactions') // Sub-collection for transactions
+        .doc(transactionId) // Specific transaction ID
         .delete();
   }
 
-  // Function to modify a transaction (this will be a placeholder for now)
+  // Function to modify a transaction
   void _modifyTransaction(BuildContext context, String transactionId,
       Map<String, dynamic> transactionData) {
     // Passing the transaction data to AddTransactionScreen for editing
@@ -26,11 +41,22 @@ class TransactionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? userId = getCurrentUserUid();
+    if (userId == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text('Transactions')),
+        body: Center(child: Text('Please log in to see your transactions.')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text('Transactions')),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance.collection('transactions').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('users') // Users collection
+            .doc(userId) // Document with user's UID
+            .collection('transactions') // Sub-collection for transactions
+            .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());

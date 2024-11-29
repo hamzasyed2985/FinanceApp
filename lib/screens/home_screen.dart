@@ -7,7 +7,6 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _HomeScreenState createState() => _HomeScreenState();
 }
 
@@ -24,13 +23,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _calculateSummary() async {
-    final transactions =
-        await FirebaseFirestore.instance.collection('transactions').get();
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == null) {
+      // Handle case where user is not logged in
+      return;
+    }
+
+    final transactions = await FirebaseFirestore.instance
+        .collection('users') // Users collection
+        .doc(userId) // Document with user's UID
+        .collection('transactions') // Sub-collection for transactions
+        .get(); // Get all transaction documents for this user
+
     double balance = 0.0, income = 0.0, expenses = 0.0;
 
     // Reset category expenses for each calculation
     categoryExpenses = {};
 
+    // Iterate through each transaction document
     for (var doc in transactions.docs) {
       final data = doc.data();
       final amount = data['amount'] ?? 0.0;
@@ -53,7 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
-    // Safely call setState if the widget is still mounted
     if (mounted) {
       setState(() {
         totalBalance = balance;
@@ -66,24 +76,25 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Finance Tracker')),
+      appBar: AppBar(title: const Text('Finance Tracker')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Total Balance',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text(
               '\$${totalBalance.toStringAsFixed(2)}',
-              style: TextStyle(
-                  fontSize: 32,
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 32,
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -91,12 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildSummaryCard('Expenses', totalExpenses, Colors.red),
               ],
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Expense Categories',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             // Pie chart widget
             categoryExpenses.isNotEmpty
                 ? SizedBox(
@@ -110,26 +121,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   )
-                : Center(child: Text('No expenses recorded')),
-            Spacer(),
+                : const Center(child: Text('No expenses recorded')),
+            const Spacer(),
             Center(
               child: ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/transactions')
                     .then((_) => _calculateSummary()),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),
-                child: Text('View Transactions'),
+                child: const Text('View Transactions'),
               ),
             ),
             ElevatedButton(
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
                 if (mounted) {
-                  Navigator.pushReplacementNamed(context, '');
+                  Navigator.pushReplacementNamed(context, '/loginSignup');
                 }
               },
-              child: Text('Logout'),
+              child: const Text('Logout'),
             ),
           ],
         ),
@@ -137,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(context, '/addTransaction')
             .then((_) => _calculateSummary()),
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -151,13 +163,16 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               title,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               '\$${amount.toStringAsFixed(2)}',
               style: TextStyle(
-                  fontSize: 20, color: color, fontWeight: FontWeight.bold),
+                fontSize: 20,
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -173,8 +188,11 @@ class _HomeScreenState extends State<HomeScreen> {
         color: _getCategoryColor(category),
         title: category,
         radius: 50,
-        titleStyle: TextStyle(
-            fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+        titleStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
       ));
     });
     return sections;

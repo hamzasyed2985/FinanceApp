@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginSignupScreen extends StatefulWidget {
   const LoginSignupScreen({Key? key}) : super(key: key);
@@ -19,6 +20,27 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
   String _password = '';
   String _name = '';
   String _confirmPassword = '';
+
+  // Function to create user document if it doesn't exist
+  Future<void> createUserDocumentIfNeeded() async {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      print("No user is logged in. Please log in first.");
+      return;
+    }
+
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(userId);
+    final userSnapshot = await userDoc.get();
+
+    // If the user document doesn't exist, create it
+    if (!userSnapshot.exists) {
+      await userDoc.set({
+        'uid': userId,
+        'createdAt': FieldValue.serverTimestamp(),
+        // Add other fields you want for the user document
+      });
+    }
+  }
 
   void _showErrorDialog(String message) {
     if (!mounted) return;
@@ -44,18 +66,25 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
     _formKey.currentState!.save();
 
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
 
       await _auth.signInWithEmailAndPassword(
           email: _email, password: _password);
+
+      // Create user document if needed
+      await createUserDocumentIfNeeded();
 
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/home');
       }
     } on FirebaseAuthException catch (e) {
-      _showErrorDialog(e.message ?? 'An error occurred during login');
+      if (mounted) {
+        _showErrorDialog(e.message ?? 'An error occurred during login');
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -75,22 +104,30 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
     }
 
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
 
       await _auth.createUserWithEmailAndPassword(
           email: _email, password: _password);
 
+      // Set display name if provided
       if (_name.isNotEmpty) {
         await _auth.currentUser!.updateDisplayName(_name);
       }
+
+      // Create user document if needed
+      await createUserDocumentIfNeeded();
 
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/home');
       }
     } on FirebaseAuthException catch (e) {
-      _showErrorDialog(e.message ?? 'An error occurred during signup');
+      if (mounted) {
+        _showErrorDialog(e.message ?? 'An error occurred during signup');
+      }
     } finally {
       if (mounted) {
         setState(() {

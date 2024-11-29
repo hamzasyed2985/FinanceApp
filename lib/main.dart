@@ -9,6 +9,7 @@ import 'package:finance_app/screens/login_signup_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase
+  FirebaseAuth.instance.signOut();
   runApp(const MyApp());
 }
 
@@ -39,7 +40,8 @@ class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(), // Listen to auth changes
+      stream:
+          FirebaseAuth.instance.authStateChanges(), // Listen to auth changes
       builder: (context, snapshot) {
         // Check if the user is authenticated
         if (snapshot.connectionState == ConnectionState.waiting) {

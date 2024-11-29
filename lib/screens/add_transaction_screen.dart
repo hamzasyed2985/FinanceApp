@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   const AddTransactionScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _AddTransactionScreenState createState() => _AddTransactionScreenState();
 }
 
@@ -33,12 +33,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     }
   }
 
+  // Get the current user's UID
+  String? getCurrentUserUid() {
+    final user = FirebaseAuth.instance.currentUser;
+    return user?.uid;
+  }
+
   // Save the transaction (either create or update)
   Future<void> _saveTransaction() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      print("Saving transaction: Amount=$_amount, Type=$_type, Category=$_category");
+      String? userId = getCurrentUserUid();
+      if (userId == null) {
+        print("No user is logged in. Please log in first.");
+        return; // Ensure user is logged in
+      }
+
+      print(
+          "Saving transaction: Amount=$_amount, Type=$_type, Category=$_category");
 
       Map<String, dynamic> transactionData = {
         'amount': _amount,
@@ -49,14 +62,20 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
       if (_transactionId == null) {
         print("Adding new transaction to Firestore.");
+        // Store transactions under user's UID in Firestore
         await FirebaseFirestore.instance
-            .collection('transactions')
+            .collection('users') // Users collection
+            .doc(userId) // Document with user's UID
+            .collection('transactions') // Sub-collection for transactions
             .add(transactionData);
       } else {
         print("Updating transaction with ID=$_transactionId in Firestore.");
+        // Update the transaction under the user's UID
         await FirebaseFirestore.instance
-            .collection('transactions')
-            .doc(_transactionId)
+            .collection('users') // Users collection
+            .doc(userId) // Document with user's UID
+            .collection('transactions') // Sub-collection for transactions
+            .doc(_transactionId) // Specific transaction ID
             .update(transactionData);
       }
 
@@ -202,7 +221,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       setState(() {
                         _type = 'Income';
                         _category = 'Salary'; // Reset category for income
-                        print("Type set to: $_type, Category reset to: $_category");
+                        print(
+                            "Type set to: $_type, Category reset to: $_category");
                       });
                     },
                     style: ElevatedButton.styleFrom(
@@ -217,7 +237,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       setState(() {
                         _type = 'Expense';
                         _category = 'Food'; // Reset category for expense
-                        print("Type set to: $_type, Category reset to: $_category");
+                        print(
+                            "Type set to: $_type, Category reset to: $_category");
                       });
                     },
                     style: ElevatedButton.styleFrom(
