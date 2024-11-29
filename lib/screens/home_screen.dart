@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -52,11 +53,14 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
-    setState(() {
-      totalBalance = balance;
-      totalIncome = income;
-      totalExpenses = expenses;
-    });
+    // Safely call setState if the widget is still mounted
+    if (mounted) {
+      setState(() {
+        totalBalance = balance;
+        totalIncome = income;
+        totalExpenses = expenses;
+      });
+    }
   }
 
   @override
@@ -117,6 +121,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Text('View Transactions'),
               ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                if (mounted) {
+                  Navigator.pushReplacementNamed(context, '/loginSignup');
+                }
+              },
+              child: Text('Logout'),
             ),
           ],
         ),
