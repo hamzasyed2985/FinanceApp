@@ -5,6 +5,7 @@ class AddTransactionScreen extends StatefulWidget {
   const AddTransactionScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _AddTransactionScreenState createState() => _AddTransactionScreenState();
 }
 
@@ -27,6 +28,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       _type = arguments['type'];
       _category = arguments['category'] ??
           (_type == 'Income' ? 'Salary' : 'Food'); // Handle null category
+      print("Loaded transaction: "
+          "ID=$_transactionId, Amount=$_amount, Type=$_type, Category=$_category");
     }
   }
 
@@ -34,6 +37,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Future<void> _saveTransaction() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      print("Saving transaction: Amount=$_amount, Type=$_type, Category=$_category");
 
       Map<String, dynamic> transactionData = {
         'amount': _amount,
@@ -43,22 +48,29 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       };
 
       if (_transactionId == null) {
+        print("Adding new transaction to Firestore.");
         await FirebaseFirestore.instance
             .collection('transactions')
             .add(transactionData);
       } else {
+        print("Updating transaction with ID=$_transactionId in Firestore.");
         await FirebaseFirestore.instance
             .collection('transactions')
             .doc(_transactionId)
             .update(transactionData);
       }
 
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
+      print("Transaction saved successfully and screen popped.");
+    } else {
+      print("Form validation failed. Please check the inputs.");
     }
   }
 
   // Get category options based on transaction type
   List<DropdownMenuItem<String>> _getCategoryOptions() {
+    print("Getting category options for Type=$_type");
     if (_type == 'Income') {
       return [
         DropdownMenuItem<String>(
@@ -162,8 +174,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(
-              _transactionId == null ? 'Add Transaction' : 'Edit Transaction')),
+        title: Text(
+          _transactionId == null ? 'Add Transaction' : 'Edit Transaction',
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -176,15 +190,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 keyboardType: TextInputType.number,
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Enter an amount' : null,
-                onSaved: (value) => _amount = double.tryParse(value!),
+                onSaved: (value) {
+                  _amount = double.tryParse(value!);
+                  print("Amount entered: $_amount");
+                },
               ),
               Row(
                 children: [
                   ElevatedButton(
-                    onPressed: () => setState(() {
-                      _type = 'Income';
-                      _category = 'Salary'; // Reset category for income
-                    }),
+                    onPressed: () {
+                      setState(() {
+                        _type = 'Income';
+                        _category = 'Salary'; // Reset category for income
+                        print("Type set to: $_type, Category reset to: $_category");
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           _type == 'Income' ? Colors.green : Colors.grey,
@@ -193,10 +213,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                   SizedBox(width: 10),
                   ElevatedButton(
-                    onPressed: () => setState(() {
-                      _type = 'Expense';
-                      _category = 'Food'; // Reset category for expense
-                    }),
+                    onPressed: () {
+                      setState(() {
+                        _type = 'Expense';
+                        _category = 'Food'; // Reset category for expense
+                        print("Type set to: $_type, Category reset to: $_category");
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           _type == 'Expense' ? Colors.red : Colors.grey,
@@ -214,10 +237,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 onChanged: (value) {
                   setState(() {
                     _category = value!;
+                    print("Category changed to: $_category");
                   });
                 },
                 onSaved: (value) {
                   _category = value!;
+                  print("Category saved as: $_category");
                 },
                 validator: (value) {
                   return value == null || value.isEmpty
