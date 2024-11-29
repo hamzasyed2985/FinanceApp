@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -117,10 +118,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Text('View Transactions'),
               ),
+              
             ),
+            ElevatedButton(
+  onPressed: () async {
+    await FirebaseAuth.instance.signOut();
+  },
+  child: Text('Logout'),
+),
           ],
         ),
       ),
+      
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(context, '/addTransaction')
             .then((_) => _calculateSummary()),
