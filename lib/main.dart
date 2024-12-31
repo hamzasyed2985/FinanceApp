@@ -5,10 +5,11 @@ import 'package:finance_app/screens/add_transaction_screen.dart';
 import 'package:finance_app/screens/home_screen.dart';
 import 'package:finance_app/screens/transactions_screen.dart';
 import 'package:finance_app/screens/login_signup_screen.dart';
+import 'package:finance_app/screens/splash_screen.dart'; 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Initialize Firebase
+  await Firebase.initializeApp(); 
   FirebaseAuth.instance.signOut();
   runApp(const MyApp());
 }
@@ -20,20 +21,29 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Finance Tracker',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      // Use the authentication check to determine the initial route
-      home: AuthWrapper(),
+      theme: ThemeData(
+        primaryColor: const Color(0xFFD92A1A), 
+        scaffoldBackgroundColor: Colors.white, 
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const Color(0xFFD92A1A), 
+          secondary: Colors.white, 
+        ),
+        appBarTheme: const AppBarTheme(
+          color: Color(0xFFD92A1A), 
+          foregroundColor: Colors.white, 
+        ),
+      ),
+      home: const SplashScreen(),
       routes: {
-        '/loginSignup': (context) => LoginSignupScreen(),
-        '/home': (context) => HomeScreen(),
-        '/transactions': (context) => TransactionsScreen(),
-        '/addTransaction': (context) => AddTransactionScreen(),
+        '/loginSignup': (context) => const LoginSignupScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/transactions': (context) => const TransactionsScreen(),
+        '/addTransaction': (context) => const AddTransactionScreen(),
       },
     );
   }
 }
 
-// A wrapper to handle authentication and navigation
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
@@ -41,17 +51,17 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream:
-          FirebaseAuth.instance.authStateChanges(), // Listen to auth changes
+          FirebaseAuth.instance.authStateChanges(), 
       builder: (context, snapshot) {
-        // Check if the user is authenticated
+        
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
-          ); // Show a loading indicator while checking auth
+          ); 
         } else if (snapshot.hasData) {
-          return const HomeScreen(); // Navigate to the HomeScreen if authenticated
+          return const HomeScreen(); 
         } else {
-          return const LoginSignupScreen(); // Navigate to Login/Signup if not authenticated
+          return const LoginSignupScreen();
         }
       },
     );
