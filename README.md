@@ -1,16 +1,24 @@
-# finance_app
+📌 Finance App – Manage Your Finances Seamlessly 💰📊
+🚀 Finance App is a modern Flutter application that helps you track your income, expenses, and savings efficiently. With Firebase Authentication and Firestore Database, your financial data is secure and accessible anytime.
 
-A new Flutter project.
+📷 App Screenshots
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+📌 Home	📊 Analytics	💳 Transactions
+	
+✨ Features
 
-A few resources to get you started if this is your first Flutter project:
+✅ Firebase Authentication – Sign in with Email/Google
+✅ Firestore Database – Securely store transactions
+✅ Expense & Income Tracking – Categorized transactions
+✅ Real-time Charts – Visual insights for better management
+✅ Dark Mode Support – Switch between light & dark themes
+✅ Multi-Currency Support – Set preferred currency
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+🛠 Tech Stack
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Flutter – Cross-platform UI framework
+Dart – Programming language
+Firebase Authentication – User login & authentication
+Cloud Firestore – Database for storing transactions
+Provider / Riverpod – State management
